@@ -1,0 +1,318 @@
+#:set COLOR_ORANGE (0.956862745, 0.701960784, 0.094117647)
+#:set COLOR_BLACK (0., 0., 0.)
+#:set COLOR_WHITE (1., 1., 1.)
+#:set COLOR_WHITE_A (1., 1., 1., 1.)
+#:set COLOR_BLACK_A (0., 0., 0., 1.)
+#:set COLOR_ORANGE_A (0.956862745, 0.701960784, 0.094117647, 1.)
+
+RootWidget:
+
+<RootWidget>:
+	canvas:
+		Color:
+			rgb: COLOR_ORANGE
+		Rectangle:
+			pos: root.pos
+			size: root.size
+	FloatLayout:
+		size: root.size
+		pos: root.pos
+		BoxLayout:
+			size_hint: (.9, .95)
+			pos_hint: {'x': .05, 'y': .05}
+			orientation: 'vertical'
+			ScrollView:
+				size_hint: (1., .1)
+				pos_hint: {'y': .9}
+				scroll_timeout: 75
+				scroll_distance: 10
+				GridLayout:
+					rows: 1
+					size_hint: (None, 1.0)
+					dpacing: 20
+					padding: 10.
+					width: self.minimum_width
+					NRNLabel:
+						text: 'Days of Rage  '
+						font_size: self.height*1.4
+						size_hint: (None, 1.0)
+						width: self.texture_size[0]
+					NRNLabel:
+						text: str(app.days_of_rage) + ' '
+						font_size: self.height*1.4
+						color: COLOR_BLACK_A
+						size_hint: (None, 1.0)
+						width: self.texture_size[0]
+					NRNLabel:
+						text: 'Days of Tranquility  '
+						font_size: self.height*1.4
+						size_hint: (None, 1.0)
+						width: self.texture_size[0]
+					NRNLabel:
+						text: str(app.days_of_tranq) + ' '
+						font_size: self.height*1.4
+						color: COLOR_BLACK_A
+						size_hint: (None, 1.0)
+						width: self.texture_size[0]
+					CalendarButton:
+						text: 'Refresh'
+						font_size: self.height
+						size_hint: (None, 1.0)
+						width: self.label.texture_size[0] + 25
+						background_color_normal: COLOR_BLACK
+						on_press: app.get_online_data()
+			CalendarHeader:
+				size_hint: (1., .1)
+			CalendarWidget:
+				size_hint: (1., .8)
+
+<CalendarHeader@Widget>:
+	GridLayout:
+		size: root.size
+		pos: root.pos
+		cols: 7
+		rows: 1
+		CalendarLabel:
+			text: 'Sunday'
+		CalendarLabel:
+			text: 'Monday'
+		CalendarLabel:
+			text: 'Tuesday'
+		CalendarLabel:
+			text: 'Wednesday'
+		CalendarLabel:
+			text: 'Thursday'
+		CalendarLabel:
+			text: 'Friday'
+		CalendarLabel:
+			text: 'Saturday'
+
+<-CalendarPopup>:
+	_container: container
+	canvas:
+		Color:
+			rgb: COLOR_BLACK
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	canvas.after:
+		Color:
+			rgb: COLOR_WHITE
+		Line:
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+			width: 2.
+	GridLayout:
+        cols: 1
+        size_hint: None, None
+        pos: root.pos
+        size: root.size
+        NRNLabel:
+            text: root.title
+            size_hint_y: None
+            height: self.texture_size[1] + 16
+            text_size: self.width - 16, None
+            font_size: '35dp'
+        Widget:
+            size_hint_y: None
+            height: 4
+		BoxLayout:
+			id: container
+
+<CalendarWidget>:
+	calendar_layout: calendar_layout
+	GridLayout:
+		id: calendar_layout
+		size: root.size
+		pos: root.pos
+		cols: 7
+		rows: 5
+	NRNLogo:
+		size: root.size[0]*(5./7.), root.size[1]*.2
+		pos: root.pos[0], root.pos[1] + root.size[1]*.8
+
+<CalendarLabel>:
+	text: self.text
+	canvas:
+		Color:
+			rgb: COLOR_BLACK
+		Line:
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+			width: 2.
+	NRNLabel:
+		text: root.text
+		pos: root.pos
+		size: root.size
+		font_size: self.height*.6
+
+<EmptyCalendarDay>:
+	canvas:
+		Color:
+			rgb: COLOR_BLACK
+		Line:
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+			width: 2.
+
+<CalendarContent>:
+	toggle_button: toggle_button
+	calendar: self.calendar
+	FloatLayout:
+		size: root.size
+		pos: root.pos
+		CalendarToggleButton:
+			id: toggle_button
+			pos: root.pos
+			group: 'calendar_button'
+			on_press: root.calendar.open_popup(root)
+
+<-CalendarToggleButton>:
+	button_type: self.button_type
+	Image: 
+		source: 'assets/' + root.button_type + '_normal.png' if root.state == 'normal' else 'assets/' + root.button_type + '_down.png' 
+		keep_ratio: True
+		size: root.size
+		pos: root.pos
+
+<-CalendarToggleButton2@CalendarToggleButton>:
+	button_type: self.button_type
+	canvas.before:
+		Color:
+			rgb: COLOR_ORANGE if self.state == 'normal' else COLOR_BLACK
+		Rectangle:
+			size: self.size
+			pos: self.pos
+	canvas.after:
+		Color:
+			rgb: COLOR_BLACK if self.state == 'normal' else COLOR_WHITE
+		Line:
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+			width: 2.
+	Image: 
+		source: 'assets/' + root.button_type + '_normal.png' if root.state == 'normal' else 'assets/' + root.button_type + '_down.png' 
+		keep_ratio: True
+		size: root.size
+		pos: root.pos
+	
+<CalendarDayPopupContent>:
+	FloatLayout:
+		size: root.size
+		pos: root.pos
+		BoxLayout:
+			orientation: 'vertical'
+			pos: root.pos
+			BoxLayout:
+				size_hint: (1., .8)
+				pos_hint: {'x': 0., 'y': .4}
+				spacing: 15.
+				padding: 15.
+				orientation: 'horizontal'
+				canvas:
+					Color:
+						rgb: COLOR_ORANGE
+					Rectangle:
+						size: self.size
+						pos: self.pos
+				canvas.after:
+					Color:
+						rgb: COLOR_WHITE
+					Line:
+						rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+						width: 2.
+				CalendarToggleButton2:
+					id: no_rage
+					button_type: 'no_rage'
+					group: 'day_group'
+					on_press: if self.state == 'down': root.rage_status = self.button_type
+					on_state: if self.state == 'normal' and rage.state == 'normal': root.rage_status = 'empty'
+				CalendarToggleButton2:
+					id: rage
+					button_type: 'rage'
+					group: 'day_group'
+					on_press: if self.state == 'down': root.rage_status = self.button_type
+					on_state: if self.state == 'normal' and no_rage.state == 'normal': root.rage_status = 'empty'
+			CalendarButton:
+				text: 'Exit' if root.rage_status == 'empty' else ('Yes' if root.rage_status == 'rage' else 'No')
+				size_hint: (1.0, .2)
+				font_size: self.height
+				on_press: root.popup.dismiss()
+
+<NRNLabel@Label>:
+	font_name: 'assets/talldark.ttf'
+
+<NRNLogo@Widget>:
+	canvas:
+		Color:
+			rgb: COLOR_ORANGE
+		Rectangle:
+			size: self.size
+			pos: self.pos
+		Color:
+			rgb: COLOR_BLACK
+		Line:
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+			width: 2.
+	BoxLayout:
+		pos: root.pos
+		size: root.size
+		orientation: 'horizontal'
+		NRNLabel:
+			color: COLOR_WHITE_A
+			text: 'NO[color=000000]RAGE[/color]NOVEMBER[color=000000] 2013[/color]'
+			font_size: self.height
+			markup: True
+
+<CalendarDay>:
+	day_number: self.day_number
+	calendar: self.calendar
+	state: calendar_content.toggle_button.state
+	day_type: calendar_content.toggle_button.button_type
+	canvas.before:
+		Color:
+			rgb: COLOR_ORANGE if self.state == 'normal' else COLOR_BLACK
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	canvas.after:
+		Color:
+			rgb: COLOR_BLACK
+		Line:
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+			width: 2.
+	CalendarContent:
+		id: calendar_content
+		calendar: root.calendar
+		size: root.size
+		pos: root.pos
+	AnchorLayout:
+		anchor_x: 'left'
+		anchor_y: 'top'
+		padding: 6
+		size: root.size
+		pos: root.pos
+		NRNLabel:
+			text: str(root.day_number)
+			size: self.texture_size
+			size_hint: (None, None)
+			font_size: '30dp'
+
+<-CalendarButton>:
+	background_color_normal: COLOR_ORANGE
+	background_color_down: COLOR_WHITE
+	label: label
+	canvas.before:
+		Color:
+			rgb: self.background_color_normal if self.state == 'normal' else self.background_color_down
+		Rectangle:
+			size: self.size
+			pos: self.pos
+		Color:
+			rgb: COLOR_WHITE
+		Line:
+			width: 2.
+			rectangle: self.pos[0], self.pos[1], self.size[0], self.size[1]
+	NRNLabel:
+		id: label
+		text: root.text
+		pos: root.pos
+		size: root.size
+		color: COLOR_WHITE_A if root.state == 'normal' else COLOR_BLACK_A
+		font_size: root.font_size
